@@ -1,0 +1,56 @@
+<html>
+<title>Current Hour</title>
+<head>
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "root";
+$db = "Project";
+$id = 0;
+$link = new mysqli($servername,$username,$password,$db);
+if($link->connect_error)
+{
+die("Connection Failed: " . $link->connect_error);
+}
+else if($link)
+{
+
+}
+$sql = "SELECT * FROM SystemLoad  WHERE ID > date_sub(now(), interval 1 hour)";
+$result = $link->query($sql);
+$chart_data = '';
+if($result->num_rows>0)
+{
+while($row = $result->fetch_assoc())
+{
+$chart_data .= "{ Timestamp ' . $row["ID"] . ' SystemLoad (%) ' . $row["SystemLoad"]
+}
+$chart_data = substr($chart_data, 0 , -2);
+}
+else
+{
+echo "0 results";
+}
+?>
+<link rel ="stylesheet" href= "//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"> </script>
+<script src="//cdnjs.cloudfare.com/ajax/libs/raphael/2.1.0/raphael-min.js"> </script>
+<script src="//cdnjs.cloudfare.com/ajax/libs/morris.js/0.5.1/morris.min.js"> </script>
+<script>
+Morris.Bar({
+element : 'chart',
+data:[<?php echo $chart_data; ?>],
+xkey:'ID',
+ykey:'SystemLoad',
+label: 'SystemLoad',
+hideHover:'auto',
+stacked:true
+});
+</script>
+</head>
+<body>
+<a href="past.php"><input type ="button" name="hour" value="Past Hour"></a>
+<a href="pastday.php"><input type ="button" name="day" value="Past Day"></a>
+<a href="averageload.php"><input type ="button" name="average" value="All Time Average"></a>
+</body>
+</html>
